@@ -15,7 +15,7 @@ struct id3v1tag {
 };
 
 struct genre {
-	int gnum;;
+	int gnum;
 	char *genre;
 } genres[256] = {
 	{0, "Unknown"},
@@ -148,17 +148,27 @@ struct genre {
 
 #define MAXGENRE 125
 
-main(argc, argv)
-char **argv;
+void
+printfield(description, field, length)
+char *description, *field;
+int length;
 {
-	char **f;
+	char buf[sizeof(struct id3v1tag)], *bptr;
 
-	printf("sizeof tag is %d\n", sizeof(struct id3v1tag));
-	for (f= argv+1; *f; f++) {
-		id3v1(*f);
+	memset(buf, 0, sizeof(struct id3v1tag));
+	memcpy(buf, field, length);
+	buf[length] = 0;
+	for (bptr = buf+length; bptr >= buf; --bptr) {
+		switch(*bptr) {
+			case ' ': *bptr = 0;
+			case 0	: break;;
+			default	: printf("%s: %s\n", description, buf);
+				  return;
+		}
 	}
 }
 
+void
 id3v1(f)
 char *f;
 {
@@ -200,22 +210,16 @@ char *f;
 		printf("genre: %s\n", genres[tag.genre].genre);
 }
 
-printfield(description, field, length)
-char *description, *field;
-int length;
+int
+main(argc, argv)
+int argc;
+char **argv;
 {
-	char buf[sizeof(struct id3v1tag)], *bptr;
+	char **f;
 
-	memset(buf, 0, sizeof(struct id3v1tag));
-	memcpy(buf, field, length);
-	buf[length] = 0;
-	for (bptr = buf+length; bptr >= buf; --bptr) {
-		switch(*bptr) {
-			case ' ': *bptr = 0;
-			case 0	: break;;
-			default	: printf("%s: %s\n", description, buf);
-				  return;
-		}
+	printf("sizeof tag is %lu\n", sizeof(struct id3v1tag));
+	for (f= argv+1; *f; f++) {
+		id3v1(*f);
 	}
 }
 
