@@ -41,6 +41,7 @@ char *FileName;
 
 // www.id3.org/id3v2.3.0 
 
+int
 main(argc, argv)
 	int argc;
 	char **argv;
@@ -232,7 +233,8 @@ mp3frame(mp3file)
 
 	// D
 	dprintf(stderr, "D: %8x\n", mp3hdr & MP3ERROR);
-	if (hascrc = ((mp3hdr & MP3ERROR) != MP3ERROR)) { /* 0: protected */
+	hascrc = (mp3hdr & MP3ERROR) != MP3ERROR;	/* 0: protected */
+	if (hascrc) { /* 0: protected */
 		dprintf(stderr, "CRC\n");	/* we can handle this */
 		return -1;
 	}
