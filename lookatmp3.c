@@ -421,7 +421,7 @@ mp3compare(mp3file, start, len)
 	long start, len;
 {	FILE *md5write;
 	int p2c[2], c2p[2], childpid;
-	char buf[BUFSIZE], md5string[80], *newline;
+	char buf[BUFSIZE], md5string[BUFSIZE], *newline;
 
 	if (pipe(p2c) < 0) {
 		perror("pipe");
@@ -498,10 +498,11 @@ mp3compare(mp3file, start, len)
 		exit(-1);
 	}
 
-	if (read(c2p[0], md5string, 80) < 0) {
+	if (read(c2p[0], md5string, BUFSIZE) < 0) {
 		perror("parent read md5 string");
 		exit(-1);
 	}
+ 	md5string[BUFSIZE-1] = 0;
 
 	if ((newline = index(md5string, '\n')) != NULL)
 		*newline = 0;
